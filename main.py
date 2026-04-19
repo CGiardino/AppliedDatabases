@@ -19,7 +19,7 @@ def _show_sessions_for_speaker_letters() -> None:
     rows = fetch_sessions_by_speaker_name(speaker_name)
 
     if not rows:
-        print('No sessions found for that search.\n')
+        print('No speakers found of that name.\n')
         return
 
     print(f'\nSession Details For : {speaker_name}')
