@@ -1,6 +1,10 @@
 from dao.sessionDAO import fetch_sessions_by_speaker_name
 from dao.companyDAO import fetch_company_by_id
-from dao.attendeeDAO import fetch_attendees_by_company_id
+from dao.attendeeDAO import fetch_attendees_by_company_id, add_attendee
+import pymysql.err
+
+ERROR_PREFIX = '*** ERROR ***'
+MENU_SEPARATOR = '---------------------'
 
 def _display_menu() -> None:
     print('MENU')
@@ -48,9 +52,34 @@ def _show_attendees_by_company_id() -> None:
         print()
         break
 
+def _add_attendee() -> None:
+    print('Add New Attendee')
+    print(MENU_SEPARATOR)
+    attendee_id = input('Attendee ID : ')
+    attendee_name = input('Name : ')
+    attendee_dob = input('DOB : ')
+    attendee_gender = input('Gender : ')
+    if attendee_gender != 'Male' and attendee_gender != 'Female':
+        print(f'{ERROR_PREFIX} Gender must be Male/Female.')
+        return
+    company_id = input('Company ID : ')
+    try:
+        company_id_int = int(company_id)
+    except ValueError:
+        print(f'{ERROR_PREFIX} Company ID: {company_id} does not exist.\n')
+        return
+    company = fetch_company_by_id(company_id_int)
+    if not company:
+        print(f'{ERROR_PREFIX} Company ID: {company_id_int} does not exist.\n')
+        return
+    try:
+        add_attendee(attendee_id, attendee_name, attendee_dob, attendee_gender, company_id_int)
+        print('\nAttendee successfully added.\n')
+    except pymysql.err.IntegrityError :
+        print(f'{ERROR_PREFIX} Attendee ID: {attendee_id} already exists.\n')
 def _run_menu() -> None:
     print('Conference Management')
-    print('---------------------\n')
+    print(f'{MENU_SEPARATOR}\n')
     while True:
         _display_menu()
         choice = input('Choice: ').strip().lower()
@@ -68,6 +97,12 @@ def _run_menu() -> None:
                 _show_attendees_by_company_id()
             except Exception as exc:
                 print(f'Could not load attendees: {exc}\n')
+            continue
+        if choice == '3':
+            try:
+                _add_attendee()
+            except Exception as exc:
+                print(f'{ERROR_PREFIX} {exc}\n')
             continue
 
         print(f'Option "{choice}" selected. Not implemented yet.\n')

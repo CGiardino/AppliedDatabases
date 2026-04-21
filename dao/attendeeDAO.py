@@ -16,3 +16,13 @@ def fetch_attendees_by_company_id(company_id: int) -> list[dict[str, Any]]:
             return cursor.fetchall()
     finally:
         connection.close()
+        
+def add_attendee(attendee_id: str, attendee_name: str, attendee_dob: str, attendee_gender:str, attendee_company_id: int) -> None:
+    query = 'INSERT INTO attendee (attendeeID, attendeeName, attendeeDOB, attendeeGender, attendeeCompanyID) VALUES (%s, %s, %s, %s, %s)'
+    connection = create_mysql_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query, (attendee_id, attendee_name, attendee_dob, attendee_gender, attendee_company_id))
+            connection.commit()
+    finally:
+        connection.close()
