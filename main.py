@@ -1,6 +1,7 @@
 from dao.sessionDAO import fetch_sessions_by_speaker_name
 from dao.companyDAO import fetch_company_by_id
-from dao.attendeeDAO import fetch_attendees_by_company_id, add_attendee
+from dao.attendeeDAO import fetch_attendees_by_company_id, add_attendee, fetch_attendee_name_by_id, fetch_attendee_names_by_ids
+from dao.attendeeRelationshipDAO import fetch_connected_attendees, attendee_exists_in_graph
 import pymysql.err
 
 ERROR_PREFIX = '*** ERROR ***'
@@ -77,6 +78,40 @@ def _add_attendee() -> None:
         print('\nAttendee successfully added.\n')
     except pymysql.err.IntegrityError :
         print(f'{ERROR_PREFIX} Attendee ID: {attendee_id} already exists.\n')
+
+
+def _fetch_connected_attendees() -> None:
+    attendee_id_text = input('Enter attendee ID : ')
+    try:
+        attendee_id = int(attendee_id_text)
+    except ValueError:
+        print(f'{ERROR_PREFIX} Invalid attendee ID\n')
+        return
+    
+    attendee = fetch_attendee_name_by_id(attendee_id)
+    exists_in_neo4j = attendee_exists_in_graph(attendee_id)
+    if not attendee and not exists_in_neo4j:
+        print(f'{ERROR_PREFIX} Attendee does not exist\n')
+        return
+
+    rows = fetch_connected_attendees(attendee_id)
+    if not rows:
+        print(f'Attendee Name: {attendee["attendeeName"]}')
+        print(f'{MENU_SEPARATOR}')
+        print(f'No connections\n')
+        return
+
+    connected_attendee_ids = [row['attendeeID'] for row in rows]
+    attendee_names = fetch_attendee_names_by_ids(connected_attendee_ids)
+
+    print('These attendees are connected:')
+    for row in rows:
+        connected_attendee_id = row['attendeeID']
+        attendee_name = attendee_names.get(connected_attendee_id, 'Unknown attendee in MySQL')
+        print(f'{connected_attendee_id} | {attendee_name}')
+    print()
+
+
 def _run_menu() -> None:
     print('Conference Management')
     print(f'{MENU_SEPARATOR}\n')
@@ -103,6 +138,12 @@ def _run_menu() -> None:
                 _add_attendee()
             except Exception as exc:
                 print(f'{ERROR_PREFIX} {exc}\n')
+            continue
+        if choice == '4':
+            try:
+                _fetch_connected_attendees()
+            except Exception as exc:
+                print(f'Could not load attendee connections: {exc}\n')
             continue
 
         print(f'Option "{choice}" selected. Not implemented yet.\n')

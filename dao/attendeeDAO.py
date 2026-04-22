@@ -26,3 +26,31 @@ def add_attendee(attendee_id: str, attendee_name: str, attendee_dob: str, attend
             connection.commit()
     finally:
         connection.close()
+
+
+def fetch_attendee_name_by_id(attendee_id: int):
+    query = 'SELECT attendeeName FROM attendee WHERE attendeeID = %s LIMIT 1'
+    connection = create_mysql_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query, (attendee_id,))
+            return cursor.fetchone()
+    finally:
+        connection.close()
+
+
+def fetch_attendee_names_by_ids(attendee_ids: list[int]) -> dict[int, str]:
+    if not attendee_ids:
+        return {}
+
+    placeholders = ', '.join(['%s'] * len(attendee_ids))
+    query = f'SELECT attendeeID, attendeeName FROM attendee WHERE attendeeID IN ({placeholders})'
+
+    connection = create_mysql_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query, tuple(attendee_ids))
+            rows = cursor.fetchall()
+            return {row['attendeeID']: row['attendeeName'] for row in rows}
+    finally:
+        connection.close()

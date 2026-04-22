@@ -1,7 +1,9 @@
 from typing import Any
 
-from config.db_config import DB_CONFIG
-import pymysql 
+import pymysql
+from neo4j import GraphDatabase
+
+from config.db_config import DB_CONFIG, NEO4J_CONFIG
 
 def create_mysql_connection() -> Any:
     try:
@@ -19,3 +21,11 @@ def create_mysql_connection() -> Any:
                 "'cryptography' is required for MySQL auth. Install with: pip install -r requirements.txt"
             ) from exc
         raise
+
+
+def create_neo4j_driver() -> Any:
+    return GraphDatabase.driver(
+        NEO4J_CONFIG['uri'],
+        auth=(NEO4J_CONFIG['user'], NEO4J_CONFIG['password']),
+    )
+
