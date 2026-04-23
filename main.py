@@ -1,7 +1,7 @@
-from dao.sessionDAO import fetch_sessions_by_speaker_name
-from dao.companyDAO import fetch_company_by_id
-from dao.attendeeDAO import fetch_attendees_by_company_id, add_attendee, fetch_attendee_name_by_id, fetch_attendee_names_by_ids
-from dao.attendeeRelationshipDAO import fetch_connected_attendees, attendee_exists_in_graph, add_attendee_relationship, add_attendee_in_graph
+from dao.speaker_session_dao import fetch_sessions_by_speaker_name
+from dao.company_dao import fetch_company_by_id
+from dao.attendee_dao import fetch_attendees_by_company_id, add_attendee, fetch_attendee_name_by_id, fetch_attendee_names_by_ids
+from dao.attendee_connection_dao import fetch_connected_attendees, attendee_exists_in_graph, add_attendee_relationship, add_attendee_in_graph
 import pymysql.err
 from exceptions.attendee_exceptions import AttendeesAlreadyConnectedError
 
