@@ -1,8 +1,9 @@
 from dao.sessionDAO import fetch_sessions_by_speaker_name
 from dao.companyDAO import fetch_company_by_id
 from dao.attendeeDAO import fetch_attendees_by_company_id, add_attendee, fetch_attendee_name_by_id, fetch_attendee_names_by_ids
-from dao.attendeeRelationshipDAO import fetch_connected_attendees, attendee_exists_in_graph
+from dao.attendeeRelationshipDAO import fetch_connected_attendees, attendee_exists_in_graph, add_attendee_relationship, add_attendee_in_graph
 import pymysql.err
+from exceptions.attendee_exceptions import AttendeesAlreadyConnectedError
 
 ERROR_PREFIX = '*** ERROR ***'
 MENU_SEPARATOR = '---------------------'
@@ -111,7 +112,36 @@ def _fetch_connected_attendees() -> None:
         print(f'{connected_attendee_id} | {attendee_name}')
     print()
 
-
+def _add_attendee_connection() -> None:
+    print('Add Attendee Connection')
+    print(MENU_SEPARATOR)
+    while True:
+        attendee_1 = input('Enter Attendee 1 ID : ')
+        attendee_2 = input('Enter Attendee 2 ID : ')
+        try:
+            attendee_1_int = int(attendee_1)
+            attendee_2_int = int(attendee_2)
+        except ValueError:
+            print(f'{ERROR_PREFIX} Attendee IDs must be numbers\n')
+            continue
+        if attendee_1_int == attendee_2_int:
+            print(f'{ERROR_PREFIX} An attendee cannot connect to himself/herself\n')
+            continue
+        if fetch_attendee_name_by_id(attendee_1_int) is None or fetch_attendee_name_by_id(attendee_2_int) is None:
+            print(f'{ERROR_PREFIX} One or both attendee IDs do not exist\n')
+            continue
+        if not attendee_exists_in_graph(attendee_1_int):
+            add_attendee_in_graph(attendee_1_int)
+        if not attendee_exists_in_graph(attendee_2_int):
+            add_attendee_in_graph(attendee_2_int)
+        try:
+            add_attendee_relationship(attendee_1_int, attendee_2_int)
+            print(f'Attendee {attendee_1_int} is now connected to Attendee {attendee_2_int}\n')
+        except AttendeesAlreadyConnectedError:
+            print(f'{ERROR_PREFIX} These attendees are already connected\n')
+            continue
+        break
+   
 def _run_menu() -> None:
     print('Conference Management')
     print(f'{MENU_SEPARATOR}\n')
@@ -143,10 +173,14 @@ def _run_menu() -> None:
             try:
                 _fetch_connected_attendees()
             except Exception as exc:
-                print(f'Could not load attendee connections: {exc}\n')
+                print(f'{ERROR_PREFIX} Could not load attendee connections: {exc}\n')
             continue
-
-        print(f'Option "{choice}" selected. Not implemented yet.\n')
+        if choice == '5':
+            try:
+                _add_attendee_connection()
+            except Exception as exc:
+                print(f'{ERROR_PREFIX} Could not connect attendees: {exc}\n')
+            continue
 
 if __name__ == '__main__':
     _run_menu()
