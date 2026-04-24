@@ -4,9 +4,12 @@ from dao.attendee_dao import fetch_attendees_by_company_id, add_attendee, fetch_
 from dao.attendee_connection_dao import fetch_connected_attendees, attendee_exists_in_graph, add_attendee_relationship, add_attendee_in_graph
 import pymysql.err
 from exceptions.attendee_exceptions import AttendeesAlreadyConnectedError
+from dao.room_dao import fetch_rooms
 
 ERROR_PREFIX = '*** ERROR ***'
 MENU_SEPARATOR = '---------------------'
+
+rooms = {'is_loaded': False, 'rooms': []}
 
 def _display_menu() -> None:
     print('MENU')
@@ -53,6 +56,15 @@ def _show_attendees_by_company_id() -> None:
             print(f"{attendee['attendeeName']} | {attendee['attendeeDOB']} | {attendee['sessionTitle']} | {attendee['speakerName']} | {attendee['roomName']}")
         print()
         break
+        
+def _show_rooms(rooms: dict) -> None:
+    if not rooms['is_loaded']:
+        rooms['rooms'] = fetch_rooms()
+        rooms['is_loaded'] = True
+    print('Room ID | Room Name | Capacity')
+    for room in rooms['rooms']:
+        print(f"{room['roomID']} | {room['roomName']} | {room['capacity']}")
+    print()
 
 def _add_attendee() -> None:
     print('Add New Attendee')
@@ -155,13 +167,13 @@ def _run_menu() -> None:
             try:
                 _show_sessions_for_speaker_letters()
             except Exception as exc:
-                print(f'Could not load sessions: {exc}\n')
+                print(f'{ERROR_PREFIX} Could not load sessions: {exc}\n')
             continue
         if choice == '2':
             try:
                 _show_attendees_by_company_id()
             except Exception as exc:
-                print(f'Could not load attendees: {exc}\n')
+                print(f'{ERROR_PREFIX} Could not load attendees: {exc}\n')
             continue
         if choice == '3':
             try:
@@ -181,6 +193,11 @@ def _run_menu() -> None:
             except Exception as exc:
                 print(f'{ERROR_PREFIX} Could not connect attendees: {exc}\n')
             continue
-
+        if choice == '6':
+            try:
+                _show_rooms(rooms)
+            except Exception as exc:
+                print(f'{ERROR_PREFIX} Could not load rooms: {exc}\n')
+                
 if __name__ == '__main__':
     _run_menu()
