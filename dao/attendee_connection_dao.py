@@ -19,7 +19,7 @@ def fetch_connected_attendees(attendee_id: int) -> list[dict[str, Any]]:
 
 	driver = create_neo4j_driver()
 	try:
-		with driver.session(database=NEO4J_CONFIG['database']) as session:
+		with driver.session() as session:
 			return session.execute_read(fetch_tx, attendee_id)
 	finally:
 		driver.close()
@@ -43,7 +43,7 @@ def add_attendee_relationship(attendee_id: int, connected_attendee_id: int) -> N
 
 	driver = create_neo4j_driver()
 	try:
-		with driver.session(database=NEO4J_CONFIG['database']) as session:
+		with driver.session() as session:
 			session.execute_write(add_relationship_tx, attendee_id, connected_attendee_id)
 	finally:
 		driver.close()
@@ -59,7 +59,7 @@ def add_attendee_in_graph(attendee_id: int) -> None:
 
 	driver = create_neo4j_driver()
 	try:
-		with driver.session(database=NEO4J_CONFIG['database']) as session:
+		with driver.session() as session:
 			session.execute_write(add_attendee_tx, attendee_id)
 	finally:
 		driver.close()
@@ -77,7 +77,7 @@ def attendee_exists_in_graph(attendee_id: int) -> bool:
 
 	driver = create_neo4j_driver()
 	try:
-		with driver.session(database=NEO4J_CONFIG['database']) as session:
+		with driver.session() as session:
 			return session.execute_read(exists_tx, attendee_id)
 	finally:
 		driver.close()
