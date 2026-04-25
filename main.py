@@ -1,3 +1,4 @@
+from controllers.attendee_controller import update_attendee
 from dao.speaker_session_dao import fetch_sessions_by_speaker_name
 from dao.company_dao import fetch_company_by_id
 from dao.attendee_dao import fetch_attendees_by_company_id, add_attendee, fetch_attendee_name_by_id, fetch_attendee_names_by_ids
@@ -5,9 +6,10 @@ from dao.attendee_connection_dao import fetch_connected_attendees, attendee_exis
 import pymysql.err
 from exceptions.attendee_exceptions import AttendeesAlreadyConnectedError
 from dao.room_dao import fetch_rooms
+import datetime
 
-ERROR_PREFIX = '*** ERROR ***'
-MENU_SEPARATOR = '---------------------'
+from utils.constants import MENU_SEPARATOR, ERROR_PREFIX, DATE_FORMAT
+from utils.gender_enum import Gender
 
 rooms = {'is_loaded': False, 'rooms': []}
 
@@ -20,6 +22,7 @@ def _display_menu() -> None:
     print('4 - View Connected Attendees')
     print('5 - Add Attendee Connection')
     print('6 - View Rooms')
+    print('7 - Update Attendee Details')
     print('x - Exit application')
 
 def _show_sessions_for_speaker_letters() -> None:
@@ -71,9 +74,16 @@ def _add_attendee() -> None:
     print(MENU_SEPARATOR)
     attendee_id = input('Attendee ID : ')
     attendee_name = input('Name : ')
-    attendee_dob = input('DOB : ')
+    attendee_dob = input('DOB (YYYY-MM-DD) : ')
+    try:
+        datetime.datetime.strptime(attendee_dob, DATE_FORMAT)
+    except ValueError:
+        print(f'{ERROR_PREFIX} DOB must be in YYYY-MM-DD format.')
+        return
     attendee_gender = input('Gender : ')
-    if attendee_gender != 'Male' and attendee_gender != 'Female':
+    try:
+        gender_enum = Gender(attendee_gender)
+    except ValueError:
         print(f'{ERROR_PREFIX} Gender must be Male/Female.')
         return
     company_id = input('Company ID : ')
@@ -87,7 +97,7 @@ def _add_attendee() -> None:
         print(f'{ERROR_PREFIX} Company ID: {company_id_int} does not exist.\n')
         return
     try:
-        add_attendee(attendee_id, attendee_name, attendee_dob, attendee_gender, company_id_int)
+        add_attendee(attendee_id, attendee_name, attendee_dob, gender_enum.value, company_id_int)
         print('\nAttendee successfully added.\n')
     except pymysql.err.IntegrityError :
         print(f'{ERROR_PREFIX} Attendee ID: {attendee_id} already exists.\n')
@@ -153,7 +163,7 @@ def _add_attendee_connection() -> None:
             print(f'{ERROR_PREFIX} These attendees are already connected\n')
             continue
         break
-   
+
 def _run_menu() -> None:
     print('Conference Management')
     print(f'{MENU_SEPARATOR}\n')
@@ -198,6 +208,13 @@ def _run_menu() -> None:
                 _show_rooms(rooms)
             except Exception as exc:
                 print(f'{ERROR_PREFIX} Could not load rooms: {exc}\n')
+            continue
+        if choice == '7':
+            try:
+                update_attendee()
+            except Exception as exc:
+                print(f'{ERROR_PREFIX} Could not update attendee: {exc}\n')
+            continue
                 
 if __name__ == '__main__':
     _run_menu()

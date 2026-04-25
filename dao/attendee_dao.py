@@ -54,3 +54,17 @@ def fetch_attendee_names_by_ids(attendee_ids: list[int]) -> dict[int, str]:
             return {row['attendeeID']: row['attendeeName'] for row in rows}
     finally:
         connection.close()
+
+def update_attendee_in_db(attendee_id: int, attendee_name: str, attendee_dob: str, attendee_gender: str, attendee_company_id: int) -> None:
+    """Update attendee details in the database."""
+    query = (
+        'UPDATE attendee SET attendeeName = %s, attendeeDOB = %s, attendeeGender = %s, attendeeCompanyID = %s '
+        'WHERE attendeeID = %s'
+    )
+    connection = create_mysql_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query, (attendee_name, attendee_dob, attendee_gender, attendee_company_id, attendee_id))
+            connection.commit()
+    finally:
+        connection.close()
