@@ -1,4 +1,4 @@
-from controllers.attendee_controller import update_attendee
+from services.attendee_service import update_attendee
 from dao.speaker_session_dao import fetch_sessions_by_speaker_name
 from dao.company_dao import fetch_company_by_id
 from dao.attendee_dao import fetch_attendees_by_company_id, add_attendee, fetch_attendee_name_by_id, fetch_attendee_names_by_ids
