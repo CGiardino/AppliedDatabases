@@ -1,6 +1,6 @@
-# AppliedDatabases
+# Applied Databases Final Project
 
-Final Project for Applied Databases
+A conference management system for handling speakers, sessions, attendees, companies, and rooms. This project demonstrates integration with MySQL and Neo4j databases, allowing users to view and manage conference data through a menu-driven Python application.
 
 ## Application Menu Options
 
@@ -28,11 +28,10 @@ The main menu in `main.py` provides the following options:
    - `pip install -r requirements.txt`
 2. Start services from `resources/`:
    - `docker compose -f resources/docker-compose.yml up -d`
-3. No action - Startup seeds run automatically on first initialization:
-   - MySQL loads `resources/appdbproj.sql` on first container initialization.
-   - Neo4j runs `resources/appdbprojNeo4j.json` via `resources/neo4j_seed.sh`.
-4. If needed, update DB settings in `db_config.py`.
-5. Run the app:
+   - automatically MySQL loads `resources/appdbproj.sql` on first container initialization.
+   - automatically Neo4j loads `resources/appdbprojNeo4j.json` via `resources/neo4j_seed.sh`.
+3. If needed, update DB settings in `db_config.py`.
+4. Run the app:
    - `python3 main.py`
 
 ## Reseed Data
@@ -41,4 +40,3 @@ The main menu in `main.py` provides the following options:
 - To force a clean reload for both databases:
   - `docker compose -f resources/docker-compose.yml down -v`
   - `docker compose -f resources/docker-compose.yml up -d`
-
