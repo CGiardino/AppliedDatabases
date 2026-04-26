@@ -3,7 +3,7 @@ from typing import Any
 from utils.db_utils import create_mysql_connection
 
 
-def fetch_sessions_by_speaker_name(letters: str) -> list[dict[str, Any]]:
+def fetch_sessions_by_speaker_name_in_db(letters: str) -> list[dict[str, Any]]:
     search_text = letters.strip()
     if not search_text:
         return []

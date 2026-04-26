@@ -1,11 +1,10 @@
 from typing import Any
 
-from config.db_config import NEO4J_CONFIG
 from utils.db_utils import create_neo4j_driver
 from exceptions.attendee_exceptions import AttendeesAlreadyConnectedError
 
 
-def fetch_connected_attendees(attendee_id: int) -> list[dict[str, Any]]:
+def fetch_connected_attendees_in_graph(attendee_id: int) -> list[dict[str, Any]]:
 	query = (
 		"MATCH (a:Attendee {AttendeeID: $attendee_id})-[:CONNECTED_TO]-(connected:Attendee) "
 		"WHERE connected.AttendeeID <> $attendee_id "
@@ -24,7 +23,7 @@ def fetch_connected_attendees(attendee_id: int) -> list[dict[str, Any]]:
 	finally:
 		driver.close()
 
-def add_attendee_relationship(attendee_id: int, connected_attendee_id: int) -> None:
+def add_attendee_relationship_in_graph(attendee_id: int, connected_attendee_id: int) -> None:
 	check_query = (
 		"MATCH (a1:Attendee {AttendeeID: $attendee_id})-[:CONNECTED_TO]-(a2:Attendee {AttendeeID: $connected_attendee_id}) "
 		"RETURN COUNT(*) AS rel_count"

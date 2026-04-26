@@ -2,7 +2,7 @@ from typing import Any
 
 from utils.db_utils import create_mysql_connection
 
-def fetch_attendees_by_company_id(company_id: int) -> list[dict[str, Any]]:
+def fetch_attendees_by_company_id_in_db(company_id: int) -> list[dict[str, Any]]:
     query = ('SELECT a.attendeeName, a.attendeeDOB, s.sessionTitle, s.speakerName, rm.roomName FROM attendee a '
              'join registration r on (a.attendeeID = r.attendeeID)'
              'join session s on (r.sessionID = s.sessionID)'
@@ -17,7 +17,7 @@ def fetch_attendees_by_company_id(company_id: int) -> list[dict[str, Any]]:
     finally:
         connection.close()
         
-def add_attendee(attendee_id: str, attendee_name: str, attendee_dob: str, attendee_gender:str, attendee_company_id: int) -> None:
+def add_attendee_in_db(attendee_id: str, attendee_name: str, attendee_dob: str, attendee_gender:str, attendee_company_id: int) -> None:
     query = 'INSERT INTO attendee (attendeeID, attendeeName, attendeeDOB, attendeeGender, attendeeCompanyID) VALUES (%s, %s, %s, %s, %s)'
     connection = create_mysql_connection()
     try:
@@ -28,7 +28,7 @@ def add_attendee(attendee_id: str, attendee_name: str, attendee_dob: str, attend
         connection.close()
 
 
-def fetch_attendee_name_by_id(attendee_id: int):
+def fetch_attendee_name_by_id_in_db(attendee_id: int):
     query = 'SELECT attendeeName FROM attendee WHERE attendeeID = %s LIMIT 1'
     connection = create_mysql_connection()
     try:
@@ -39,7 +39,7 @@ def fetch_attendee_name_by_id(attendee_id: int):
         connection.close()
 
 
-def fetch_attendee_names_by_ids(attendee_ids: list[int]) -> dict[int, str]:
+def fetch_attendee_names_by_ids_in_db(attendee_ids: list[int]) -> dict[int, str]:
     if not attendee_ids:
         return {}
 
