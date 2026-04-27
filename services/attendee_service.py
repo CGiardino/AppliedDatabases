@@ -4,6 +4,8 @@ from dao.attendee_connection_dao import add_attendee_in_graph, add_attendee_rela
     fetch_connected_attendees_in_graph
 from dao.attendee_dao import fetch_attendee_name_by_id_in_db, update_attendee_in_db, fetch_attendee_names_by_ids_in_db, \
     add_attendee_in_db, fetch_attendees_by_company_id_in_db
+from dao.attendee_connection_dao import delete_attendee_in_graph
+from dao.attendee_dao import delete_attendee_in_db
 from dao.company_dao import fetch_company_by_id_in_db
 import datetime
 
@@ -170,3 +172,28 @@ def show_attendees_by_company_id() -> None:
             print(f"{attendee['attendeeName']} | {attendee['attendeeDOB']} | {attendee['sessionTitle']} | {attendee['speakerName']} | {attendee['roomName']}")
         print()
         break
+
+# Delete attendee from both MySQL and Neo4j
+def delete_attendee() -> None:
+    print('Delete Attendee')
+    print(MENU_SEPARATOR)
+    attendee_id = input('Attendee ID to delete: ')
+    try:
+        attendee_id_int = int(attendee_id)
+    except ValueError:
+        print(f'{ERROR_PREFIX} Attendee ID must be an integer.\n')
+        return
+    attendee = fetch_attendee_name_by_id_in_db(attendee_id_int)
+    if not attendee:
+        print(f'{ERROR_PREFIX} Attendee ID: {attendee_id_int} does not exist.\n')
+        return
+    confirm = input(f'Are you sure you want to delete attendee {attendee["attendeeName"]} (ID: {attendee_id_int})? (y/n): ').strip().lower()
+    if confirm != 'y':
+        print('Deletion cancelled.\n')
+        return
+    try:
+        delete_attendee_in_db(attendee_id_int)
+        delete_attendee_in_graph(attendee_id_int)
+        print('Attendee ID ',attendee_id ,' deleted successfully.\n')
+    except Exception as exc:
+        print(f'{ERROR_PREFIX} Could not delete attendee: {exc}')

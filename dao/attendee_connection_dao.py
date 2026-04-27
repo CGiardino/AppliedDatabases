@@ -80,3 +80,22 @@ def attendee_exists_in_graph(attendee_id: int) -> bool:
 			return session.execute_read(exists_tx, attendee_id)
 	finally:
 		driver.close()
+
+# Delete attendee and all their relationships
+def delete_attendee_in_graph(attendee_id: int) -> None:
+	query = (
+		"MATCH (a:Attendee {AttendeeID: $attendee_id}) "
+		#detach delete removes the node and all its relationships
+		"DETACH DELETE a"
+	)
+
+	def delete_tx(tx, param_attendee_id):
+		tx.run(query, attendee_id=param_attendee_id)
+
+	driver = create_neo4j_driver()
+	try:
+		with driver.session() as session:
+			session.execute_write(delete_tx, attendee_id)
+	finally:
+		driver.close()
+
