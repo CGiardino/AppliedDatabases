@@ -1,18 +1,76 @@
-import pymysql
-
-from dao.attendee_connection_dao import add_attendee_in_graph, add_attendee_relationship_in_graph, attendee_exists_in_graph, \
+from dao.attendee_dao import (
+    fetch_attendee_name_by_id_in_db,
+    update_attendee_in_db,
+    add_attendee_in_db,
+    fetch_attendees_by_company_id_in_db,
+    delete_attendee_in_db,
+    fetch_session_ids_by_attendee_id_in_db,
+    fetch_attendee_names_by_ids_in_db,
+    fetch_session_details_by_ids_in_db
+)
+from dao.attendee_connection_dao import delete_attendee_in_graph, add_attendee_in_graph, add_attendee_relationship_in_graph, attendee_exists_in_graph, \
     fetch_connected_attendees_in_graph
-from dao.attendee_dao import fetch_attendee_name_by_id_in_db, update_attendee_in_db, fetch_attendee_names_by_ids_in_db, \
-    add_attendee_in_db, fetch_attendees_by_company_id_in_db
-from dao.attendee_connection_dao import delete_attendee_in_graph
-from dao.attendee_dao import delete_attendee_in_db
 from dao.company_dao import fetch_company_by_id_in_db
-import datetime
-
 from exceptions.attendee_exceptions import AttendeesAlreadyConnectedError
 from utils.constants import MENU_SEPARATOR, ERROR_PREFIX, DATE_FORMAT
 from utils.gender_enum import Gender
+import datetime
+import pymysql
 
+
+# Show all connected attendees who go to the same session as the given attendee
+def show_connected_attendees_same_session() -> None:
+    print('Show Connected Attendees in Same Session')
+    print(MENU_SEPARATOR)
+    attendee_id_text = input('Enter attendee ID: ')
+    try:
+        attendee_id = int(attendee_id_text)
+    except ValueError:
+        print(f'{ERROR_PREFIX} Invalid attendee ID\n')
+        return
+    attendee = fetch_attendee_name_by_id_in_db(attendee_id)
+    if not attendee:
+        print(f'{ERROR_PREFIX} Attendee does not exist\n')
+        return
+    connected_rows = fetch_connected_attendees_in_graph(attendee_id)
+    if not connected_rows:
+        print('No connected attendees found.\n')
+        return
+    connected_ids = [row['attendeeID'] for row in connected_rows]
+    attendee_sessions = set(fetch_session_ids_by_attendee_id_in_db(attendee_id))
+    if not attendee_sessions:
+        print('This attendee is not registered for any sessions.\n')
+        return
+    attendee_names = fetch_attendee_names_by_ids_in_db(connected_ids)
+    # Gather all session IDs to fetch details in one query
+    all_shared_session_ids = set()
+    sessions_by_connected = {}
+    for cid in connected_ids:
+        sessions = set(fetch_session_ids_by_attendee_id_in_db(cid))
+        shared_sessions = attendee_sessions & sessions
+        if shared_sessions:
+            sessions_by_connected[cid] = shared_sessions
+            all_shared_session_ids.update(shared_sessions)
+
+    if not sessions_by_connected:
+        print('No connected attendees share a session with this attendee.\n')
+        return
+
+    # Fetch session details
+    session_details = fetch_session_details_by_ids_in_db(list(all_shared_session_ids))
+
+    for cid, shared_sessions in sessions_by_connected.items():
+        print(f"{MENU_SEPARATOR}")
+        print(f"Connected to attendee ID: {cid} | {attendee_names.get(cid, 'Unknown')}")
+        print(f"Sharing sessions:")
+        for sid in shared_sessions:
+            sid_int = int(sid)
+            details = session_details.get(sid_int)
+            if details:
+                print(f"Session ID: {sid_int} | Title: {details['sessionTitle']} | Speaker: {details['speakerName']} | Room ID: {details['roomID']}")
+            else:
+                print(f"Session ID: {sid_int} (details unavailable)")
+    print()
 
 def update_attendee() -> None:
     print('Update Attendee Details')

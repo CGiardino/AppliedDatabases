@@ -1,0 +1,4 @@
+These are the new choices added to the menu:
+7 - Update Attendee Details: Allows updating the details of an existing attendee (name, DOB, gender, company).
+8 - Delete Attendee: Removes an attendee from both MySQL and Neo4j databases after confirmation.
+9 - Show Connected Attendees in the same Session: Displays all connected attendees who share at least one session with the selected attendee, including session details (title, speaker, room).
