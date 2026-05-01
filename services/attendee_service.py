@@ -53,7 +53,7 @@ def show_connected_attendees_same_session() -> None:
             all_shared_session_ids.update(shared_sessions)
 
     if not sessions_by_connected:
-        print('No connected attendees share a session with this attendee.\n')
+        print('No connected attendees share sessions with the selected attendee.\n')
         return
 
     # Fetch session details
@@ -61,16 +61,16 @@ def show_connected_attendees_same_session() -> None:
 
     for cid, shared_sessions in sessions_by_connected.items():
         print(f"{MENU_SEPARATOR}")
-        print(f"Connected to attendee ID: {cid} | {attendee_names.get(cid, 'Unknown')}")
-        print(f"Sharing sessions:")
+        print(f"Connected to {attendee_names.get(cid, 'Unknown')}, attendee ID: {cid}\n")
+        print("SessionID | Title | Date | Speaker | RoomID")
         for sid in shared_sessions:
             sid_int = int(sid)
             details = session_details.get(sid_int)
             if details:
-                print(f"Session ID: {sid_int} | Title: {details['sessionTitle']} | Speaker: {details['speakerName']} | Room ID: {details['roomID']}")
+                print(f"{sid_int} | {details['sessionTitle']} | {details['speakerName']} | {details['sessionDate']} | {details['roomID']}")
             else:
-                print(f"Session ID: {sid_int} (details unavailable)")
-    print()
+                print(f"{sid_int} | details unavailable")
+    print(f"{MENU_SEPARATOR}\n")
 
 def update_attendee() -> None:
     print('Update Attendee Details')
@@ -227,7 +227,7 @@ def show_attendees_by_company_id() -> None:
             print(f'No attendees found for {company["companyName"]}\n')
             break
         for attendee in attendees:
-            print(f"{attendee['attendeeName']} | {attendee['attendeeDOB']} | {attendee['sessionTitle']} | {attendee['speakerName']} | {attendee['roomName']}")
+            print(f"{attendee['attendeeName']} | {attendee['attendeeDOB']} | {attendee['sessionTitle']} | {attendee['speakerName']} | {attendee['sessionDate']} | {attendee['roomName']}")
         print()
         break
 

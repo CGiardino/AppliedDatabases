@@ -6,7 +6,7 @@ def fetch_session_details_by_ids_in_db(session_ids: list[int]) -> dict[int, dict
     if not session_ids:
         return {}
     placeholders = ', '.join(['%s'] * len(session_ids))
-    query = f'SELECT sessionID, sessionTitle, speakerName, roomID FROM session WHERE sessionID IN ({placeholders})'
+    query = f'SELECT sessionID, sessionTitle, sessionDate, speakerName, roomID FROM session WHERE sessionID IN ({placeholders})'
     connection = create_mysql_connection()
     try:
         with connection.cursor() as cursor:
@@ -29,12 +29,12 @@ def fetch_session_ids_by_attendee_id_in_db(attendee_id: int) -> list[int]:
         connection.close()
 
 def fetch_attendees_by_company_id_in_db(company_id: int) -> list[dict[str, Any]]:
-    query = ('SELECT a.attendeeName, a.attendeeDOB, s.sessionTitle, s.speakerName, rm.roomName FROM attendee a '
-             'join registration r on (a.attendeeID = r.attendeeID)'
-             'join session s on (r.sessionID = s.sessionID)'
-             'join room rm on (s.roomID = rm.roomID)'
+    query = ('SELECT a.attendeeName, a.attendeeDOB, s.sessionTitle, s.speakerName, s.sessionDate, rm.roomName FROM attendee a '
+             'LEFT JOIN registration r ON a.attendeeID = r.attendeeID '
+             'LEFT JOIN session s ON r.sessionID = s.sessionID '
+             'LEFT JOIN room rm ON s.roomID = rm.roomID '
              'WHERE a.attendeeCompanyID = %s '
-             'ORDER BY a.attendeeName, a.attendeeDOB')
+             'ORDER BY a.attendeeName, a.attendeeDOB, s.sessionDate desc')
     connection = create_mysql_connection()
     try:
         with connection.cursor() as cursor:
