@@ -19,14 +19,14 @@ services:
     image: neo4j:5-community
     container_name: neo4j-container
     environment:
-      NEO4J_AUTH: neo4j/password
+      NEO4J_AUTH: neo4j/neo4jneo4j
     ports:
       - "7474:7474"
       - "7687:7687"
     volumes:
       - neo4j-data:/data
     healthcheck:
-      test: ["CMD-SHELL", "cypher-shell -a bolt://localhost:7687 -u neo4j -p password \"RETURN 1\" >/dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "cypher-shell -a bolt://localhost:7687 -u neo4j -p neo4jneo4j \"RETURN 1\" >/dev/null 2>&1 || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 30
