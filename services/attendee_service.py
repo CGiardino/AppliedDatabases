@@ -62,12 +62,12 @@ def show_connected_attendees_same_session() -> None:
     for cid, shared_sessions in sessions_by_connected.items():
         print(f"{MENU_SEPARATOR}")
         print(f"Connected to {attendee_names.get(cid, 'Unknown')}, attendee ID: {cid}\n")
-        print("SessionID | Title | Date | Speaker | RoomID")
+        print("Session ID | Title | Date | Speaker | Room Name")
         for sid in shared_sessions:
             sid_int = int(sid)
             details = session_details.get(sid_int)
             if details:
-                print(f"{sid_int} | {details['sessionTitle']} | {details['speakerName']} | {details['sessionDate']} | {details['roomID']}")
+                print(f"{sid_int} | {details['sessionTitle']} | {details['speakerName']} | {details['sessionDate']} | {details['roomName']}")
             else:
                 print(f"{sid_int} | details unavailable")
     print(f"{MENU_SEPARATOR}\n")

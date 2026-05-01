@@ -6,7 +6,10 @@ def fetch_session_details_by_ids_in_db(session_ids: list[int]) -> dict[int, dict
     if not session_ids:
         return {}
     placeholders = ', '.join(['%s'] * len(session_ids))
-    query = f'SELECT sessionID, sessionTitle, sessionDate, speakerName, roomID FROM session WHERE sessionID IN ({placeholders})'
+    query = (f"SELECT s.sessionID, s.sessionTitle, s.sessionDate, s.speakerName, rm.roomName "
+             f"FROM session s "
+             f"LEFT JOIN room rm ON s.roomID = rm.roomID "
+             f"WHERE s.sessionID IN ({placeholders})")
     connection = create_mysql_connection()
     try:
         with connection.cursor() as cursor:
