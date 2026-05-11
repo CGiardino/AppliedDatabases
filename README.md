@@ -1,8 +1,8 @@
 # Applied Databases — Final Project
 
-A small conference-management Python application that demonstrates working with both a relational database (MySQL) and a graph database (Neo4j). The app provides a simple menu-driven CLI to view and manage speakers, sessions, attendees, companies, rooms and attendee connections.
+A small conference-management Python application that demonstrates working with both a relational database (MySQL) and a graph database (Neo4j). The app provides a simple menu-driven CLI to view and manage speakers, sessions, attendees, companies, rooms, and attendee connections.
 
-This repository contains the application code, database seed files, Docker service definitions and an innovation report (see `innovation.pdf`). The PDF was created by Carmine Giardino and documents the innovation/design rationale for the project.
+This repository contains the application code, database seed files, Docker service definitions, and an innovation report (see `innovation.pdf`).
 
 Key features
 - Menu-driven CLI to inspect and manipulate conference data
@@ -76,11 +76,11 @@ Seeding and reloading data
   docker compose -f resources/docker-compose.yml up -d
 
 Development notes
-- The codebase separates raw DB operations (DAOs) from higher-level application logic (services). This makes testing and future changes easier.
+- The codebase separates raw DB operations (DAOs) from higher-level application logic (services).
 - If you add new DB fields or change schema, update `resources/appdbproj.sql` and re-seed the database.
 
 About the innovation report
-- See `innovation.pdf` in the project root for the project's innovation/design write-up.
+- See `innovation.pdf` in the project root for the project's new features.
 
 Troubleshooting
 - If the app cannot connect to MySQL, confirm the container is running and `config/db_config.py` host/port/credentials match the running container.
