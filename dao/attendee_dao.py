@@ -102,12 +102,15 @@ def update_attendee_in_db(attendee_id: int, attendee_name: str, attendee_dob: st
 # Delete attendee by ID
 def delete_attendee_in_db(attendee_id: int) -> None:
     """Delete attendee from the database by attendee ID."""
-    query = 'DELETE FROM attendee WHERE attendeeID = %s'
     connection = create_mysql_connection()
     try:
         with connection.cursor() as cursor:
-            cursor.execute(query, (attendee_id,))
+            cursor.execute('DELETE FROM registration WHERE attendeeID = %s', (attendee_id,))
+            cursor.execute('DELETE FROM attendee WHERE attendeeID = %s', (attendee_id,))
             connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
     finally:
         connection.close()
 
