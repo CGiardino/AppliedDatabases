@@ -179,35 +179,32 @@ def fetch_connected_attendees() -> None:
 def add_attendee() -> None:
     print('Add New Attendee')
     print(MENU_SEPARATOR)
-    attendee_id = input('Attendee ID : ')
+    attendee_id_text = input('Attendee ID : ')
     attendee_name = input('Name : ')
     attendee_dob = input('DOB (YYYY-MM-DD) : ')
-    try:
-        datetime.datetime.strptime(attendee_dob, DATE_FORMAT)
-    except ValueError:
-        print(f'{ERROR_PREFIX} DOB must be in YYYY-MM-DD format.')
-        return
     attendee_gender = input('Gender : ')
+    company_id_text = input('Company ID : ')
+
     try:
         gender_enum = Gender(attendee_gender)
     except ValueError:
-        print(f'{ERROR_PREFIX} Gender must be Male/Female.')
+        print(f'{ERROR_PREFIX} Gender must be Male/Female.\n')
         return
-    company_id = input('Company ID : ')
+
     try:
-        company_id_int = int(company_id)
+        company_id_int = int(company_id_text)
     except ValueError:
-        print(f'{ERROR_PREFIX} Company ID: {company_id} does not exist.\n')
+        print(f'{ERROR_PREFIX} Company ID: {company_id_text} does not exist.\n')
         return
     company = fetch_company_by_id_in_db(company_id_int)
     if not company:
         print(f'{ERROR_PREFIX} Company ID: {company_id_int} does not exist.\n')
         return
     try:
-        add_attendee_in_db(attendee_id, attendee_name, attendee_dob, gender_enum.value, company_id_int)
+        add_attendee_in_db(attendee_id_text, attendee_name, attendee_dob, gender_enum.value, company_id_int)
         print('\nAttendee successfully added.\n')
-    except pymysql.err.IntegrityError :
-        print(f'{ERROR_PREFIX} Attendee ID: {attendee_id} already exists.\n')
+    except pymysql.err.IntegrityError:
+        print(f'{ERROR_PREFIX} Attendee ID: {attendee_id_text} already exists.\n')
 
 def show_attendees_by_company_id() -> None:
     while True:
