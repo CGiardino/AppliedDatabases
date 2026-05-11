@@ -3,7 +3,7 @@ from services.attendee_service import update_attendee, add_attendee_connection, 
 
 from services.room_service import show_rooms
 from services.session_service import show_sessions_for_speaker_letters
-from utils.constants import MENU_SEPARATOR, ERROR_PREFIX
+from utils.constants import MENU_SEPARATOR, ERROR_PREFIX, CONFERENCE_SEPARATOR
 
 rooms = {'is_loaded': False, 'rooms': []}
 
@@ -23,7 +23,7 @@ def _display_menu() -> None:
 
 def _run_menu() -> None:
     print('Conference Management')
-    print(f'{MENU_SEPARATOR}\n')
+    print(f'{CONFERENCE_SEPARATOR}\n')
     while True:
         _display_menu()
         choice = input('Choice: ').strip().lower()

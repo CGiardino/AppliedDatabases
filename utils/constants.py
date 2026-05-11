@@ -1,3 +1,4 @@
 ERROR_PREFIX = '*** ERROR ***'
-MENU_SEPARATOR = '---------------------'
+CONFERENCE_SEPARATOR = '---------------------'
+MENU_SEPARATOR = '------------------------------------------'
 DATE_FORMAT = '%Y-%m-%d'
