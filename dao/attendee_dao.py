@@ -2,7 +2,7 @@ from typing import Any
 from utils.db_utils import create_mysql_connection
 
 # Fetch session details for a list of session IDs
-def fetch_session_details_by_ids_in_db(session_ids: list[int]) -> dict[int, dict]:
+def fetch_session_details_by_ids_in_db(session_ids: list[int]) -> dict[int, dict[str, Any]]:
     if not session_ids:
         return {}
     placeholders = ', '.join(['%s'] * len(session_ids))

@@ -22,12 +22,15 @@ import pymysql
 def show_connected_attendees_same_session() -> None:
     print('Show Connected Attendees in Same Session')
     print(MENU_SEPARATOR)
-    attendee_id_text = input('Enter attendee ID: ')
-    try:
-        attendee_id = int(attendee_id_text)
-    except ValueError:
-        print(f'{ERROR_PREFIX} Invalid attendee ID\n')
-        return
+    attendee_id = 0
+    while True:
+        attendee_id_text = input('Enter attendee ID: ')
+        try:
+            attendee_id = int(attendee_id_text)
+            break
+        except ValueError:
+            print(f'{ERROR_PREFIX} Invalid attendee ID\n')
+            continue
     attendee = fetch_attendee_name_by_id_in_db(attendee_id)
     if not attendee:
         print(f'{ERROR_PREFIX} Attendee does not exist\n')
@@ -146,23 +149,24 @@ def add_attendee_connection() -> None:
 
 
 def fetch_connected_attendees() -> None:
-    attendee_id_text = input('Enter attendee ID : ')
-    try:
-        attendee_id = int(attendee_id_text)
-    except ValueError:
-        print(f'{ERROR_PREFIX} Invalid attendee ID\n')
-        return
+    while True:
+        attendee_id_text = input('Enter attendee ID : ')
+        try:
+            attendee_id = int(attendee_id_text)
+            break
+        except ValueError:
+            print(f'{ERROR_PREFIX} Invalid attendee ID\n')
 
     attendee = fetch_attendee_name_by_id_in_db(attendee_id)
     exists_in_neo4j = attendee_exists_in_graph(attendee_id)
     if not attendee and not exists_in_neo4j:
         print(f'{ERROR_PREFIX} Attendee does not exist\n')
         return
+    print(f'Attendee Name: {attendee["attendeeName"]}')
+    print(f'{MENU_SEPARATOR}')
 
     rows = fetch_connected_attendees_in_graph(attendee_id)
     if not rows:
-        print(f'Attendee Name: {attendee["attendeeName"]}')
-        print(f'{MENU_SEPARATOR}')
         print(f'No connections\n')
         return
 
